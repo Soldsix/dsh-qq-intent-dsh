@@ -1,0 +1,7 @@
+- insert:
+    - id: qq-intent-dsh-settings
+      name: dsh-qq-intent-dsh/control
+    - id: qq-intent-dsh
+      name: dsh-qq-intent-dsh
+      config:
+        enabled: false
