@@ -1,5 +1,6 @@
 /** Exercise an exact already-installed archive through a synthetic local DSH endpoint. */
 import assert from 'node:assert/strict'
+import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
 import {createServer} from 'node:http'
@@ -26,7 +27,9 @@ const requests=[],server=createServer(async(req,res)=>{
 })
 server.listen(0,'127.0.0.1');await once(server,'listening');server.unref()
 const patch=join(area,'overlay.yml');await writeFile(patch,JSON.stringify([{id:'intent-probe',config:{resultPath:join(area,'result.json')}}],null,2)+'\n')
-const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL/i.test(key)))
+const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL|^NPM_CONFIG_CACHE$/i.test(key)))
+env.NPM_CONFIG_CACHE=join(root,'.npm-cache')
+configureTestNetwork(env,process.allowedNodeEnvironmentFlags.has('--use-env-proxy'))
 await mkdir(join(area,'temp'),{recursive:true});Object.assign(env,{DSH_HOME:home,TEMP:join(area,'temp'),TMP:join(area,'temp'),DSH_PRIMARY_RUNTIME:'',DSH_SYSTEM_PROMPT:'Synthetic global prompt that the classifier must replace.',DEEPSEEK_API_KEY:'synthetic-loopback-only',DEEPSEEK_BASE_URL:'http://127.0.0.1:'+server.address().port+'/anthropic'})
 const child=spawn(process.execPath,[join(profileRoot,'node_modules','@deepseek-ai','dsh','lib','bin.js'),'--profile',profile,'--patch',patch],{cwd:area,env,windowsHide:true,stdio:['pipe','pipe','pipe']})
 let stdoutBytes=0,stderrBytes=0,exitCode,result;child.stdout.on('data',value=>{stdoutBytes+=value.length});child.stderr.on('data',value=>{stderrBytes+=value.length})

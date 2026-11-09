@@ -23,7 +23,7 @@ export class IntentEngine implements TurnIntent{
  constructor(private readonly config:Config,private readonly backend:IntentBackend){}
  /** @returns metadata only; no conversation or model text. */
  status():{queued:number;active:number;stopping:boolean}{return{queued:this.queued.length,active:this.running.size,stopping:this.lifetime.signal.aborted}}
- /** @param request - untrusted conversation snapshot. @param signal - caller lifetime. @returns decision, or default when capacity or input limits are reached. */
+ /** @param request - untrusted conversation snapshot. @param signal - caller lifetime. @returns decision, or default when capacity or input limits are reached. @throws the caller or shutdown cancellation reason, including when cleanup finishes after cancellation. */
  classify(request:IntentRequest,signal:AbortSignal):Promise<'reply'|'ignore'|'default'>{
   if(signal.aborted)return Promise.reject(signal.reason)
   if(this.lifetime.signal.aborted)return Promise.reject(this.lifetime.signal.reason)

@@ -3,20 +3,35 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write README.md
 /:
-  en: cb3f91d54eee30e5
-  zh: cb3f91d54eee30e5
-/description-use-native-dsh-agents-to-classify-optional-group-chat-replies-kind-package-bundle:
-  en: d0c3debde27e0b7a
-  zh: b5e5b642ed0da60b
+  en: 81e8208a509dbad5
+  zh: 903c69801ea54e7b
 /dsh-qq-intent-dsh:
   en: 1437560a273c4920
   zh: a92ef110e9655018
 /dsh-qq-intent-dsh/summary:
-  en: f4747ad071a347e0
-  zh: 5b9f0582136985c0
-/dsh-qq-intent-dsh/use-and-limits:
-  en: b41aa7ca9296a035
-  zh: 95c4fd93684a6842
-/dsh-qq-intent-dsh/testing-and-privacy:
-  en: 93a0ad75577404ac
-  zh: c0e2ebc8a7753f66
+  en: 4fb082d906b25af8
+  zh: 4027a2fbbf4dbaa4
+/dsh-qq-intent-dsh/table-of-contents:
+  en: d5cc21e6ff0a6a9f
+  zh: 5e826bf9bc49369b
+/dsh-qq-intent-dsh/installation-and-use:
+  en: 211ba69c352b5b8f
+  zh: 51c906953c4ba9ac
+/dsh-qq-intent-dsh/decisions-and-cancellation:
+  en: 6f0dc3dd12c2bb62
+  zh: f28a98be556a2254
+/dsh-qq-intent-dsh/privacy-and-storage:
+  en: c1d24e7913dbd555
+  zh: fe4e5eeef69edd82
+/dsh-qq-intent-dsh/model-experience:
+  en: 7e414fe97798ab02
+  zh: cb30c313400f2846
+/dsh-qq-intent-dsh/verification-and-limits:
+  en: aaf7704e5b4a746d
+  zh: 9265daf46314682a
+/dsh-qq-intent-dsh/known-limitations-and-deferred-work:
+  en: 616792d427a1d5f7
+  zh: d873ef6e325031e2
+/dsh-qq-intent-dsh/dev-note:
+  en: 95e674258cd342c8
+  zh: 035fef582e4b62a0

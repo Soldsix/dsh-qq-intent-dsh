@@ -1,5 +1,6 @@
 /** Run the native chat and classifier together with synthetic IM and a real model. */
 import assert from 'node:assert/strict'
+import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
 import {createHash} from 'node:crypto'
@@ -25,7 +26,9 @@ const overlay=[
  {insert:[{id:'full-preset-registry',name:'@deepseek-ai/dsh-agent-preset-registry',config:{default:'intent-full-fixture'}},{id:'full-preset',name:'@deepseek-ai/dsh-agent-preset',config:{id:'intent-full-fixture',plugins:[]}},{id:'full-transport',name:fixture('full-transport.mjs')},{id:'full-probe',name:fixture(probe),config:{resultPath:join(area,'result.json')}}]},
 ]
 const patch=join(area,'overlay.yml');await writeFile(patch,JSON.stringify(overlay,null,2)+'\n')
-const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL/i.test(key)))
+const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL|^NPM_CONFIG_CACHE$/i.test(key)))
+env.NPM_CONFIG_CACHE=join(root,'.npm-cache')
+configureTestNetwork(env,process.allowedNodeEnvironmentFlags.has('--use-env-proxy'))
 await mkdir(join(area,'temp'),{recursive:true});Object.assign(env,{DSH_HOME:home,TEMP:join(area,'temp'),TMP:join(area,'temp'),DSH_PRIMARY_RUNTIME:'',DSH_SYSTEM_PROMPT:'Synthetic isolated group conversation. No private persona or skills.'})
 const child=spawn(process.execPath,[join(profileRoot,'node_modules','@deepseek-ai','dsh','lib','bin.js'),'--profile',profile,'--patch',patch],{cwd:area,env,windowsHide:true,stdio:['pipe','pipe','pipe']})
 let stdoutBytes=0,stderrBytes=0,exitCode,result;child.stdout.on('data',value=>{stdoutBytes+=value.length});child.stderr.on('data',value=>{stderrBytes+=value.length})

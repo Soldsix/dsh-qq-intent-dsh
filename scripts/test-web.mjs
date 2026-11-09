@@ -1,5 +1,6 @@
 /** Inspect the generic plugin-manager entry in an existing isolated headless Web profile. */
 import assert from 'node:assert/strict'
+import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
 import {mkdtemp,mkdir,writeFile,copyFile,realpath,readFile} from 'node:fs/promises'
@@ -14,7 +15,9 @@ const owned=relative(permitted,home)
 assert.ok(permitted.split(/[\\/]/).includes('.test-artifacts')&&!owned.startsWith('..')&&!isAbsolute(owned),'Web profile must belong to an isolated test workspace')
 const runs=join(root,'.test-artifacts','web');await mkdir(runs,{recursive:true});const area=await mkdtemp(join(runs,'run-')),profile='turn-control-web',profileRoot=join(home,'profiles',profile),copy=join(area,basename(archive))
 await copyFile(archive,copy)
-const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL/i.test(key)))
+const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL|^NPM_CONFIG_CACHE$/i.test(key)))
+env.NPM_CONFIG_CACHE=join(root,'.npm-cache')
+configureTestNetwork(env,process.allowedNodeEnvironmentFlags.has('--use-env-proxy'))
 await mkdir(join(area,'temp'),{recursive:true});Object.assign(env,{DSH_HOME:home,TEMP:join(area,'temp'),TMP:join(area,'temp'),DSH_PRIMARY_RUNTIME:'',DSH_SYSTEM_PROMPT:'Synthetic isolated Web profile.',PLAYWRIGHT_BROWSERS_PATH:browserCache,DEEPSEEK_API_KEY:'synthetic-local-ui-only',DEEPSEEK_BASE_URL:'http://127.0.0.1:9/anthropic'})
 async function setup(argv){
  const timeout=AbortSignal.timeout(300000),child=spawn(process.execPath,argv,{cwd:area,env,windowsHide:true,signal:timeout,stdio:['ignore','pipe','pipe']});let stdoutBytes=0,stderrBytes=0,failure

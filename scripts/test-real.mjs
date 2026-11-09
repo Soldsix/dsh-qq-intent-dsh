@@ -1,5 +1,6 @@
 /** Drive synthetic intent scenarios through a managed credential store and isolated native profile. */
 import assert from 'node:assert/strict'
+import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
 import {createHash} from 'node:crypto'
@@ -16,7 +17,9 @@ const probeIndex=args.indexOf('--long'),probe=probeIndex<0?'./real-probe.mjs':'.
 const home=join(native,'home'),profile='intent-native',profileRoot=join(home,'profiles',profile),fixture=pathToFileURL(fileURLToPath(new URL(probe,import.meta.url))).href
 const overlay=[{id:'credentials',config:{path:credential,watch:false}},{id:'intent-probe',disabled:true},{id:'qq-intent-dsh',config:{enabled:true,provider:'deepseek-official',model:'deepseek-flash',reasoningEffort:'off',maxTurnsPerSession:20}},{insert:[{id:'intent-real-probe',name:fixture,config:{resultPath:join(area,'result.json')}}]}]
 const patch=join(area,'overlay.yml');await writeFile(patch,JSON.stringify(overlay,null,2)+'\n')
-const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL/i.test(key)))
+const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/KEY|SECRET|TOKEN|PASSWORD|DEEPSEEK_BASE_URL|^NPM_CONFIG_CACHE$/i.test(key)))
+env.NPM_CONFIG_CACHE=join(root,'.npm-cache')
+configureTestNetwork(env,process.allowedNodeEnvironmentFlags.has('--use-env-proxy'))
 await mkdir(join(area,'temp'),{recursive:true});Object.assign(env,{DSH_HOME:home,TEMP:join(area,'temp'),TMP:join(area,'temp'),DSH_PRIMARY_RUNTIME:'',DSH_SYSTEM_PROMPT:'Synthetic local classification test; no private persona or skills.'})
 const child=spawn(process.execPath,[join(profileRoot,'node_modules','@deepseek-ai','dsh','lib','bin.js'),'--profile',profile,'--patch',patch],{cwd:area,env,windowsHide:true,stdio:['pipe','pipe','pipe']})
 let stdoutBytes=0,stderrBytes=0,exitCode,result;child.stdout.on('data',value=>{stdoutBytes+=value.length});child.stderr.on('data',value=>{stderrBytes+=value.length})
