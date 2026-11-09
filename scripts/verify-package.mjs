@@ -17,7 +17,7 @@ for(const file of await readdir(resolve(root,'src')))if(file.endsWith('.ts')){co
 assert.ok(process.env.npm_execpath,'Run through npm run check');const child=spawn(process.execPath,[process.env.npm_execpath,'pack','--dry-run','--ignore-scripts','--json'],{cwd:root,windowsHide:true,stdio:['ignore','pipe','pipe']})
 let stdout='',stderr='',failure;child.stdout.on('data',data=>{stdout+=data});child.stderr.on('data',data=>{stderr+=data});child.once('error',error=>{failure=error})
 const [code,signal]=await new Promise(done=>child.once('close',(...values)=>done(values)));if(failure)throw failure;assert.equal(code,0,stderr);assert.equal(signal,null)
-const packed=JSON.parse(stdout);assert.equal(packed.length,1);const paths=packed[0].files.map(file=>file.path),exact=['LICENSE','README.md','README.zh.md','package.json','cordis.patch.yml']
+const packed=JSON.parse(stdout);assert.equal(packed.length,1);const paths=packed[0].files.map(file=>file.path),exact=['LICENSE','README.md','README.zh.md','README.i18n.yaml','package.json','cordis.patch.yml']
 for(const path of paths){assert.ok(exact.includes(path)||/^dist\/(?:client\/)?[a-z][a-z-]*\.(?:js|d\.ts)$/.test(path),'Unexpected packed file '+path);await checkText(path)}
 for(const path of [...exact,'dist/index.js','dist/index.d.ts','dist/runner.js','dist/engine.js','dist/control.js','dist/control.d.ts','dist/client.js','dist/client/index.d.ts'])assert.ok(paths.includes(path),'Missing packed file '+path)
 console.log(JSON.stringify({package:manifest.name,passed:true,packedFiles:paths.length}))

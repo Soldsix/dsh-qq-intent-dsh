@@ -1,0 +1,22 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write README.md
+/:
+  en: cb3f91d54eee30e5
+  zh: cb3f91d54eee30e5
+/description-use-native-dsh-agents-to-classify-optional-group-chat-replies-kind-package-bundle:
+  en: d0c3debde27e0b7a
+  zh: b5e5b642ed0da60b
+/dsh-qq-intent-dsh:
+  en: 1437560a273c4920
+  zh: a92ef110e9655018
+/dsh-qq-intent-dsh/summary:
+  en: f4747ad071a347e0
+  zh: 5b9f0582136985c0
+/dsh-qq-intent-dsh/use-and-limits:
+  en: b41aa7ca9296a035
+  zh: 95c4fd93684a6842
+/dsh-qq-intent-dsh/testing-and-privacy:
+  en: 93a0ad75577404ac
+  zh: c0e2ebc8a7753f66

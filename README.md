@@ -21,3 +21,5 @@ Only strict decision JSON is accepted. Unknown or malformed output delegates to 
 ## Testing and privacy
 
 `npm test` uses synthetic fixtures and does not send QQ messages. The classifier sends group text from the selected context snapshot to the selected model and stores model-visible input in DSH Session logs. Member IDs in the interface are temporary aliases, but message text can contain personal information. The plugin does not mount a persona or skills, and media labels contain no image or audio content. It suppresses optional runtime context; required Host context can still be included, so inspect the Host composition before deployment. Protect the profile, model credentials and Session storage separately.
+
+After caller cancellation or runtime shutdown, a decision completed during interval cleanup is rejected instead of returned as a usable result. Cancellation and shutdown still join admitted cleanup.

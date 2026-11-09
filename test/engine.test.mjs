@@ -60,3 +60,20 @@ test('configuration rejects incomplete model routes and unsafe capacity relation
  let effects=0;await apply({effect(){effects++}},Config({enabled:false}));assert.equal(effects,0)
  await assert.rejects(apply({get(){return{}},effect(){effects++}},Config({enabled:true})),/Another intent classifier/);assert.equal(effects,0)
 })
+
+
+test('late cleanup cannot return a routing decision after caller cancellation or engine shutdown',async t=>{
+ for(const mode of ['caller','shutdown']){
+  let enter,release,closed=false
+  const entered=new Promise(resolve=>enter=resolve),cleanup=new Promise(resolve=>release=resolve)
+  const backend={async run(){try{return'reply'}finally{enter();await cleanup}},async close(){closed=true}}
+  const engine=new IntentEngine(Config({maxConcurrent:1}),backend),controller=new AbortController()
+  t.after(async()=>{release();await engine.close()})
+  const result=engine.classify(request('late'),controller.signal),rejected=assert.rejects(result,error=>error.name==='AbortError')
+  await entered
+  let stopped
+  if(mode==='caller')controller.abort();else stopped=engine.close()
+  release();await rejected
+  if(stopped){await stopped;assert.equal(closed,true)}else await engine.close()
+ }
+})

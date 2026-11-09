@@ -49,7 +49,7 @@ export class IntentEngine implements TurnIntent{
    const signal=AbortSignal.any([task.signal,this.lifetime.signal])
    const finish=()=>{this.running.delete(operation);this.active.delete(task.request.contextId);this.pump()}
    const operation=Promise.resolve().then(()=>{signal.throwIfAborted();return this.backend.run(task.request,signal)})
-    .then(value=>{finish();task.resolve(value)},error=>{finish();task.reject(error)})
+    .then(value=>{finish();if(signal.aborted)task.reject(signal.reason);else task.resolve(value)},error=>{finish();task.reject(error)})
    this.running.add(operation)
   }
  }
