@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "checks": [
+    "settings-visible-while-disabled",
+    "invalid-route-keeps-draft",
+    "enable-with-host-route",
+    "valid-capacity-save",
+    "light-dark-narrow-layout",
+    "saved-model-capacity-survives-page-reload",
+    "disable-after-use"
+  ],
+  "installedFiles": {
+    "chat": 61,
+    "turn": 28,
+    "intent": 27
+  },
+  "clientErrors": [],
+  "realQqMessagesSent": 0
+}

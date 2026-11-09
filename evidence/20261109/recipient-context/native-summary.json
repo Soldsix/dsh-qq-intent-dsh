@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "dependencyResolution": "public-manifest",
+  "checks": [
+    "logged-native-sessions-reuse-rotate-and-isolate-conversations",
+    "quote-target-and-recipient-metadata-are-logged-in-native-user-events",
+    "bounded-engine-drained-after-completed-decisions",
+    "owner-settings-reject-invalid-and-guest-requests"
+  ],
+  "installedFiles": {
+    "dsh-im-kit": 18,
+    "dsh-qq-chat": 61,
+    "dsh-qq-turn-control": 28,
+    "dsh-qq-intent-dsh": 27
+  },
+  "archives": [
+    {
+      "name": "dsh-im-kit-0.2.1.tgz",
+      "sha256": "48686023b7307e3296d403994ad5cfb5cc7bfa7e4be5ef423af934b5286c40f0"
+    },
+    {
+      "name": "dsh-qq-chat-0.2.3.tgz",
+      "sha256": "7e0b13f702f1d05e2d90c66a9939ea2e23e7111dfa474666ceef0a39e6d5ef42"
+    },
+    {
+      "name": "dsh-qq-turn-control-0.2.0-development.tgz",
+      "sha256": "1ee074f16cf4fa08e9f55b26d5768af49b5eb47df9dbf7ef9de9ffae79a1a16e"
+    },
+    {
+      "name": "dsh-qq-intent-dsh-0.2.0-development.tgz",
+      "sha256": "2b766bc8081000e900d862089042b4437db20629f48af12d186c133baead4934"
+    }
+  ],
+  "modelRequests": 4,
+  "realQqMessagesSent": 0,
+  "semanticQualityVerified": false,
+  "stdoutBytes": 31954,
+  "stderrBytes": 114
+}

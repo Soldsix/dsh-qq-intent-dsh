@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0-development",
+  "sourceCommit": "6bbb4cfe89f1dce9884c8414843d5056fa7deb90",
+  "sha256": "2b766bc8081000e900d862089042b4437db20629f48af12d186c133baead4934",
+  "bytes": 33136,
+  "unitTests": {
+    "node22": 21,
+    "node24": 21
+  },
+  "nativeChecks": 4,
+  "nativeDependencyResolution": "public-manifest",
+  "controlledAdapterRequests": 4,
+  "webLocalChecks": 7,
+  "webLocalDependencyResolution": "candidate-archive-overrides",
+  "webFinalPublicSourceCiPassed": true,
+  "independentConsumer": {
+    "passed": true,
+    "installedFiles": 27,
+    "declarationFiles": 338,
+    "ancestorDependenciesBorrowed": false,
+    "realQqMessagesSent": 0
+  },
+  "ci": {
+    "run": 42609435393,
+    "passedJobs": 9
+  },
+  "realModelApiRequests": 0,
+  "qqMessagesSent": 0,
+  "semanticQualityVerified": false,
+  "productionUntouched": true,
+  "anonymousDownloadHashVerified": true
+}
