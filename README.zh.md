@@ -20,14 +20,14 @@ kind: "package-bundle"
 <a id="installation-and-use"></a>
 ## 安装与使用
 
-目标宿主为 DSH 0.2.2-rc.1，Node ^22.19 或 >=24。使用 `dsh plugin --profile <profile> add <archive.tgz>` 安装发行包。接话依赖 0.1.0 通过公开 GitHub 发行包解析；尚未发布 npm。用于 QQ 接话时还需启用接话和 Chat 运行时，分类服务本身不会连接 QQ。
+目标宿主为 DSH 0.2.2-rc.1 和 Node >=24.9；Node 22 检查记录兼容性，不扩张宿主支持范围。使用 `dsh plugin --profile <profile> add <archive.tgz>` 安装归档；turn-control 0.2.0-development 从公开 GitHub 发行解析，未发布 npm。QQ 接话仍需启用 turn-control 和 Chat 运行组件。分类器本身不连接 QQ。
 
-在 DSH 插件管理器打开本 bundle 的所有者设置页。先配置并启用分类器，再开启接话插件的意图分类。`provider` 与 `model` 要么同时填写，要么同时留空以沿用宿主路由。凭据仍由宿主凭据服务管理。修改设置要求分类器空闲；维护期间新的非指定判定委托给基础规则。
+在 DSH 插件管理器打开本 bundle 的所有者设置页。先配置并启用分类器，再开启接话插件的意图分类。`provider` 与 `model` 要么同时填写，要么同时留空以沿用宿主路由。凭据仍由宿主凭据服务管理。修改设置要求分类器空闲；维护期间新的非指定判定返回 `default`。
 
 <a id="decisions-and-cancellation"></a>
 ## 判定与取消
 
-可信消费插件提供有界会话快照和不透明上下文 ID，不能让模型或群成员选择其他会话的上下文 ID。服务只接受严格的单字段 JSON 判定：`reply`、`ignore` 或 `default`。格式错误或多余输出会委托 Chat 基础规则；媒体标签只说明类型。明确指定的消息绕过分类。
+可信消费插件提供有界会话快照和不透明上下文 ID，不能让模型或群成员选择其他会话的上下文 ID。服务只接受严格的单字段 JSON 判定：`reply`、`ignore` 或 `default`。格式错误或多余输出返回 `default`，turn-control 0.2 将其保守地视为忽略。已知 `replyTo` 和机器人 `respondingTo` 别名帮助区分回复其他成员与新成员接续机器人的公开话题。媒体标签只说明类型。明确指定的消息绕过分类。
 
 可配置并发、待处理数、活跃 Session、输入大小及轮换限制。同一上下文串行，不同上下文可并发推进。调用者取消或运行时关闭后，清理期间完成的迟到结果也会拒绝；卸载会等待已接收工作结束。分类器仍可能误读含糊或不可信的聊天；返回值仅为接话判定，不是事实回答或权限授权。
 

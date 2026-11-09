@@ -49,7 +49,7 @@ let child,exit,exitCode
 try{
  if(!resumed)await run([dsh,'--profile',profile,'--from-default-profile','sdk','--dump-config'],area)
  const manifest=JSON.parse(await readFile(join(root,'package.json'),'utf8')),profileManifest=JSON.parse(await readFile(join(profileRoot,'package.json'),'utf8'))
- profileManifest.pnpm={...profileManifest.pnpm,overrides:manifest.overrides};await writeFile(join(profileRoot,'package.json'),JSON.stringify(profileManifest,null,2)+'\n')
+ profileManifest.pnpm={...profileManifest.pnpm,overrides:{...manifest.overrides,...args.includes('--candidate-inputs')?{'dsh-im-kit':'file:'+archives[0].path,'dsh-qq-chat':'file:'+archives[1].path,'dsh-qq-turn-control':'file:'+archives[2].path}:{}}};await writeFile(join(profileRoot,'package.json'),JSON.stringify(profileManifest,null,2)+'\n')
  await writeFile(join(profileRoot,'.npmrc'),'package-import-method=copy\nstore-dir='+store.replaceAll('\\','/')+'\ncache-dir='+join(root,'.test-artifacts','pnpm-cache').replaceAll('\\','/')+'\n')
  const pnpm=await pnpmScript(root)
  const peers=['@deepseek-ai/cordis@~4.1.0','@deepseek-ai/cordis-plugin-loader@~1.1.0','@deepseek-ai/schemastery@~3.19.0',...['agent','agent-preset-registry','app-boot','brand','llm','session','session-persistence','system-prompt','tools','scope','config-editor','typert-protocol','llm-deepseek-api-key','client-connection'].map(name=>'@deepseek-ai/dsh-'+name+'@0.2.2-rc.1')]
@@ -69,11 +69,13 @@ try{
  while(Date.now()<deadline){try{result=JSON.parse(await readFile(join(attempt,'result.json'),'utf8'));break}catch(error){if(error.code!=='ENOENT')throw error}assert.equal(exitCode,undefined,'Native DSH exited before the probe');await delay(50)}
  assert.ok(result,'Native probe timed out');assert.equal(result.passed,true,JSON.stringify(result.error));assert.equal(requests.length,4)
  assert.ok(requests.every(request=>JSON.stringify(request.system).includes('group-chat bot should respond')),'Classifier section not used')
+ assert.ok(requests.every(request=>JSON.stringify(request.system).includes('respondingTo alias')),'Recipient instruction not used')
+ assert.ok(requests.some(request=>JSON.stringify(request.messages).includes('replyTo')&&JSON.stringify(request.messages).includes('respondingTo')),'Recipient and quote metadata missing from native adapter request')
  assert.ok(requests.every(request=>!JSON.stringify(request.system).includes('Synthetic global prompt')),'Global section leaked into classifier')
  assert.ok(requests.every(request=>!request.tools||request.tools.length===0),'Classifier exposed tools')
  child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:1,method:'shutdown',params:{}})+'\n')
  assert.deepEqual(await Promise.race([exit,delay(15000,undefined,{ref:false}).then(()=>{throw Error('Native shutdown timed out')})]),{code:0,signal:null})
- await writeFile(join(attempt,'summary.json'),JSON.stringify({passed:true,checks:result.checks,installedFiles,archives:archives.map(({name,sha256})=>({name,sha256})),modelRequests:requests.length,realQqMessagesSent:0,semanticQualityVerified:false,stdoutBytes,stderrBytes},null,2)+'\n')
+ await writeFile(join(attempt,'summary.json'),JSON.stringify({passed:true,dependencyResolution:args.includes('--candidate-inputs')?'candidate-archive-overrides':'public-manifest',checks:result.checks,installedFiles,archives:archives.map(({name,sha256})=>({name,sha256})),modelRequests:requests.length,realQqMessagesSent:0,semanticQualityVerified:false,stdoutBytes,stderrBytes},null,2)+'\n')
  console.log(JSON.stringify({area,attempt,passed:true,checks:result.checks,installedFiles,modelRequests:requests.length,realQqMessagesSent:0}))
 }finally{
  if(child&&exitCode===undefined){child.stdin.end();const fallback=setTimeout(()=>child.kill(),5000);await exit;clearTimeout(fallback)}

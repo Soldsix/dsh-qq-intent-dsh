@@ -20,14 +20,14 @@ Supply a decision-only intent classifier through the Host's model and durable Se
 <a id="installation-and-use"></a>
 ## Installation and use
 
-Target Host: DSH 0.2.2-rc.1, Node ^22.19 or >=24. Install the archive with `dsh plugin --profile <profile> add <archive.tgz>`. Its turn-control 0.1.0 dependency resolves through the public GitHub release; no package is published to npm. QQ routing additionally requires enabled turn-control and Chat runtimes. The classifier service itself does not connect to QQ.
+Target Host: DSH 0.2.2-rc.1 with Node >=24.9. Node 22 checks record compatibility rather than expanding the Host support range. Install the archive with `dsh plugin --profile <profile> add <archive.tgz>`. Its turn-control 0.2.0-development dependency resolves through the public GitHub release; no package is published to npm. QQ routing additionally requires enabled turn-control and Chat runtimes. The classifier service itself does not connect to QQ.
 
-Open this bundle's owner settings page in the DSH plugin manager. Configure and enable the classifier before enabling intent classification in turn control. Set both `provider` and `model`, or leave both empty to use the Host route. Credentials stay in the Host credential service. Settings changes require an idle classifier; new unaddressed decisions delegate to the basic rule during maintenance.
+Open this bundle's owner settings page in the DSH plugin manager. Configure and enable the classifier before enabling intent classification in turn control. Set both `provider` and `model`, or leave both empty to use the Host route. Credentials stay in the Host credential service. Settings changes require an idle classifier; new unaddressed decisions return `default` during maintenance.
 
 <a id="decisions-and-cancellation"></a>
 ## Decisions and cancellation
 
-A trusted consumer supplies a bounded conversation snapshot and an opaque context ID; a model or chat member must not choose another conversation's context ID. The service accepts only strict one-field decision JSON: `reply`, `ignore` or `default`. Malformed or extra output delegates to Chat's basic rules. Media labels reveal only their type. Explicitly addressed messages bypass classification.
+A trusted consumer supplies a bounded conversation snapshot and an opaque context ID; a model or chat member must not choose another conversation's context ID. The service accepts only strict one-field decision JSON: `reply`, `ignore` or `default`. Malformed or extra output returns `default`; turn-control 0.2 treats it conservatively as ignore. Known `replyTo` and bot `respondingTo` aliases help distinguish replies to another member from a new member continuing the bot's public topic. Media labels reveal only their type. Explicitly addressed messages bypass classification.
 
 Concurrency, pending requests, live Sessions, input size and rotation limits are configurable. One context runs serially while independent contexts can progress concurrently. After caller cancellation or shutdown, a result completed during interval cleanup is rejected. Disposal joins admitted work. Classifiers can still misread ambiguous or untrusted conversation; the result is a routing decision, not a factual answer or permission grant.
 

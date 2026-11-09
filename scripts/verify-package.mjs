@@ -6,7 +6,7 @@ import {resolve} from 'node:path'
 import {fileURLToPath} from 'node:url'
 const root=fileURLToPath(new URL('../',import.meta.url)),manifest=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'))
 assert.equal(manifest.name,'dsh-qq-intent-dsh');assert.equal(manifest.type,'module');assert.equal(manifest.license,'MIT');assert.ok(!manifest.bin)
-assert.equal(manifest.dsh?.bundle?.patch,'./cordis.patch.yml');assert.equal(manifest.dsh?.client?.platform,'web');assert.equal(manifest.engines?.dsh,'0.2.2-rc.1');assert.equal(manifest.dependencies?.['dsh-qq-turn-control'],'https://github.com/Soldsix/dsh-qq-turn-control/releases/download/v0.1.0/dsh-qq-turn-control-0.1.0.tgz')
+assert.equal(manifest.dsh?.bundle?.patch,'./cordis.patch.yml');assert.equal(manifest.dsh?.client?.platform,'web');assert.equal(manifest.engines?.dsh,'0.2.2-rc.1');assert.equal(manifest.dependencies?.['dsh-qq-turn-control'],'https://github.com/Soldsix/dsh-qq-turn-control/releases/download/v0.2.0-development/dsh-qq-turn-control-0.2.0-development.tgz')
 for(const section of ['dependencies','peerDependencies','devDependencies'])for(const [key,value]of Object.entries(manifest[section]??{}))assert.ok(!/^(?:file:|link:|workspace:|[a-z]:[\\/]|[\\/])/i.test(value),'Nonportable dependency '+key)
 const en=await readFile(resolve(root,'README.md'),'utf8'),zh=await readFile(resolve(root,'README.zh.md'),'utf8')
 for(const text of [en,zh]){assert.match(text,/^kind: "package-bundle"$/m);assert.match(text,/^description: ".+"$/m)}

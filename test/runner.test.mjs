@@ -5,7 +5,7 @@ import {NativeRunner} from '../dist/runner.js'
 
 const request=(contextId,text)=>({contextId,history:[],candidate:{speaker:'member-1',text,truncated:false,media:[],mentions:[],hasReply:false}})
 function fixture({toolCall=false,external=false}={}){
- const listeners=new Map(),created=[],disposed=[],setup=[]
+ const listeners=new Map(),created=[],disposed=[],setup=[],inputs=[]
  const emit=(name,...args)=>{for(const callback of listeners.get(name)??[])callback(...args)}
  const ctx={
   on(name,callback){const group=listeners.get(name)??new Set();group.add(callback);listeners.set(name,group);return()=>group.delete(callback)},
@@ -15,7 +15,7 @@ function fixture({toolCall=false,external=false}={}){
    await options.setup(scoped)
    const session={id:options.sessionId},inbox={nextTurn:[],nextStep:[]};let pending=Promise.resolve()
    const agent={session,inbox,status:'idle',cancel(){},whenIdle(){return pending},followup(input){
-    agent.status='busy';pending=Promise.resolve().then(()=>{
+    inputs.push(input);agent.status='busy';pending=Promise.resolve().then(()=>{
      if(external)emit('agent/inbox/inserted',{agent:{id:session.id},message:{id:'other-message'}})
      emit('session/event',session,{type:'user/message',data:input})
      if(toolCall)emit('session/event',session,{type:'assistant/message',data:{interrupted:false,message:{content:[{type:'tool-call'}]}}})
@@ -26,7 +26,7 @@ function fixture({toolCall=false,external=false}={}){
    created.push(options.sessionId);return{agent,async dispose(){disposed.push(options.sessionId)}}
   }},
  }
- return{ctx,created,disposed,setup}
+ return{ctx,created,disposed,setup,inputs}
 }
 test('native runner reuses, rotates and isolates scoped Sessions while denying tools',async()=>{
  const f=fixture(),runner=new NativeRunner(f.ctx,Config({maxTurnsPerSession:2}),'.'),signal=new AbortController().signal
@@ -49,4 +49,13 @@ test('input budget rotates a Session before its configured turn count',async()=>
  const f=fixture(),runner=new NativeRunner(f.ctx,Config({maxInputChars:256,maxSessionInputChars:256,maxTurnsPerSession:10}),'.'),signal=new AbortController().signal
  assert.equal(await runner.run(request('a','x'.repeat(100)),signal),'reply');assert.equal(await runner.run(request('a','x'.repeat(100)),signal),'reply')
  assert.equal(f.created.length,2);assert.equal(f.disposed.length,1);await runner.close()
+})
+
+test('recipient and quote metadata remain in the logged classifier payload and public instruction',async()=>{
+ const f=fixture(),runner=new NativeRunner(f.ctx,Config({}),'.'),input=request('context','I disagree')
+ input.history=[{speaker:'member-1',text:'A question',truncated:false,media:[],mentions:[],hasReply:false,directedToBot:true},{speaker:'bot',text:'A public answer',truncated:false,media:[],mentions:[],hasReply:false,respondingTo:'member-1'}]
+ input.candidate.replyTo={speaker:'bot',text:'A public answer',truncated:false,media:[]}
+ await runner.run(input,new AbortController().signal)
+ assert.equal(f.inputs.length,1);const logged=JSON.stringify(f.inputs[0]);assert.ok(logged.includes('respondingTo'));assert.ok(logged.includes('replyTo'));assert.ok(logged.includes('A public answer'));const instruction=f.setup.find(item=>item.section)?.section.text;assert.match(instruction,/replyTo target/);assert.match(instruction,/respondingTo alias/);assert.match(instruction,/intervening unrelated chatter/)
+ await runner.close()
 })
