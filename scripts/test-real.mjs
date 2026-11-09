@@ -1,5 +1,6 @@
 /** Drive synthetic intent scenarios through a managed credential store and isolated native profile. */
 import assert from 'node:assert/strict'
+import {requireProbeSuccess} from './probe-outcome.mjs'
 import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
@@ -29,6 +30,7 @@ try{
  while(Date.now()<deadline){try{result=JSON.parse(await readFile(join(area,'result.json'),'utf8'));break}catch(error){if(error.code!=='ENOENT')throw error}assert.equal(exitCode,undefined,'Isolated DSH exited before real probe');await delay(50)}
  assert.ok(result,'Real probe timed out');child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:1,method:'shutdown',params:{}})+'\n')
  const stopped=await Promise.race([exit,delay(15000,undefined,{ref:false}).then(()=>{throw Error('Real probe shutdown timed out')})]);assert.equal(stopped.code,0)
+ requireProbeSuccess(result,'model')
  console.log(JSON.stringify({area,executionPassed:result.executionPassed,qualityPassed:result.qualityPassed??false,completed:result.results.length,passed:result.results.filter(item=>item.passed).length,realQqMessagesSent:0}))
 }finally{
  if(exitCode===undefined){child.stdin.end();const fallback=setTimeout(()=>child.kill(),5000);await exit;clearTimeout(fallback)}

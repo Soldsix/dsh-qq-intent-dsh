@@ -1,5 +1,6 @@
 /** Run the native chat and classifier together with synthetic IM and a real model. */
 import assert from 'node:assert/strict'
+import {requireProbeSuccess} from './probe-outcome.mjs'
 import {configureTestNetwork} from './network-env.mjs'
 import {spawn} from 'node:child_process'
 import {once} from 'node:events'
@@ -39,6 +40,7 @@ try{
  assert.ok(result,'Full probe timed out');child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:1,method:'shutdown',params:{}})+'\n')
  const stopped=await Promise.race([exit,delay(15000,undefined,{ref:false}).then(()=>{throw Error('Full probe shutdown timed out')})]);assert.equal(stopped.code,0)
  await writeFile(join(area,'summary.json'),JSON.stringify({...result,installed},null,2)+'\n')
+ requireProbeSuccess(result,'full')
  console.log(JSON.stringify({area,passed:result.passed,checks:result.checks,counts:result.counts,realQqMessagesSent:0}))
 }finally{
  if(exitCode===undefined){child.stdin.end();const fallback=setTimeout(()=>child.kill(),5000);await exit;clearTimeout(fallback)}
